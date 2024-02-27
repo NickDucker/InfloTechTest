@@ -6,40 +6,64 @@ namespace UserManagement.Data.Tests;
 
 public class UserServiceTests
 {
-    [Fact]
-    public void GetAll_WhenContextReturnsEntities_MustReturnSameEntities()
+    // Arrange: Initializes objects and sets the value of the data that is passed to the methods under test.
+    private readonly UserService _service;
+    private readonly IQueryable<User> _users;
+    private readonly Mock<IDataContext> _dataContext = new();
+    public UserServiceTests()
     {
-        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
-        var service = CreateService();
-        var users = SetupUsers();
-
-        // Act: Invokes the method under test with the arranged parameters.
-        var result = service.GetAll();
-
-        // Assert: Verifies that the action of the method under test behaves as expected.
-        result.Should().BeSameAs(users);
+        // Initialize the UserService with the mocked IDataContext in the constructor
+        _service = new UserService(_dataContext.Object);
+        // Set up users for all tests
+        _users = SetupUsers(
+            ("Active User 1", "User", "active1@example.com", true),
+            ("Active User 2", "User", "active2@example.com", true),
+            ("Inactive User 1", "User", "inactive1@example.com", false),
+            ("Inactive User 2", "User", "inactive2@example.com", false)
+        );
     }
-
-    private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
+    private IQueryable<User> SetupUsers(params (string Forename, string Surname, string Email, bool IsActive)[] userParams)
     {
-        var users = new[]
+        var users = userParams.Select(u => new User
         {
-            new User
-            {
-                Forename = forename,
-                Surname = surname,
-                Email = email,
-                IsActive = isActive
-            }
-        }.AsQueryable();
+            Forename = u.Forename,
+            Surname = u.Surname,
+            Email = u.Email,
+            IsActive = u.IsActive
+        }).AsQueryable();
 
-        _dataContext
-            .Setup(s => s.GetAll<User>())
-            .Returns(users);
+        _dataContext.Setup(s => s.GetAll<User>()).Returns(users);
 
         return users;
     }
 
-    private readonly Mock<IDataContext> _dataContext = new();
-    private UserService CreateService() => new(_dataContext.Object);
+    [Fact]
+    public void GetAll_WhenContextReturnsEntities_MustReturnSameEntities()
+    {
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = _service.GetAll();
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        result.Should().BeSameAs(_users);
+    }
+
+    [Fact]
+    public void FilterByActive_WhenIsActiveTrue_MustReturnOnlyActiveUsers()
+    {
+        // Act
+        var result = _service.FilterByActive(true);
+
+        // Assert: Verifies all users in the result are active.
+        result.Should().OnlyContain(u => u.IsActive);
+    }
+
+    [Fact]
+    public void FilterByActive_WhenIsActiveFalse_MustReturnOnlyInactiveUsers()
+    {
+        // Act
+        var result = _service.FilterByActive(false);
+
+        // Assert: Verifies all users in the result are inactive.
+        result.Should().OnlyContain(u => !u.IsActive);
+    }
 }

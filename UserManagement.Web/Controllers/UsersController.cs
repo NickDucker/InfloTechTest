@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
 
@@ -19,37 +20,29 @@ public class UsersController(IUserService userService) : Controller
     /* Specifies that the following action method 
     is only intended to handle HTTP GET requests */
     [HttpGet]
-    // Method to fetch and list all users based on status.
     public ViewResult List(string status = "all")
     {
-        /* Base query to fetch all users, 
-        adjusted based on status parameter. */
-        var query = _userService.GetAll();
-
-        switch (status.ToLower())
+        IEnumerable<User> users = status.ToLower() switch
         {
-            case "active":
-                // Base query modified to fetch only active users.
-                query = query.Where(u => u.IsActive);
-                break;
-            case "inactive":
-                // Base qery modified to fetch only inactive users.
-                query = query.Where(u => !u.IsActive);
-                break;
-            /* Modifications are not required to fetch
-            all users, as this is the base query. */
-        }
+            // If status is "active", call the FilterByActive method with true as an argument.
+            "active" => _userService.FilterByActive(true),
+            // If status is "inactive", call the FilterByActive method with false as an argument.
+            "inactive" => _userService.FilterByActive(false),
+            // If status is not either of the above, call the GetAll method to retrieve all users.
+            _ => _userService.GetAll(),
+        };
 
         /* Converts the query results into a list of UserListItemViewModel 
         objects which allows the passing of only necessary data to the view 
         (5 attributes listed), enhancing both security and performance by not 
         exposing all data (other sensitive attributes retrieved from the query). */
-        var items = query.Select(p => new UserListItemViewModel
+        var items = users.Select(p => new UserListItemViewModel
         {
             Id = p.Id,
             Forename = p.Forename,
             Surname = p.Surname,
             Email = p.Email,
+            DateOfBirth = p.DateOfBirth,
             IsActive = p.IsActive
         }).ToList();
 

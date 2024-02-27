@@ -12,9 +12,9 @@ public class UserServiceTests
     private readonly Mock<IDataContext> _dataContext = new();
     public UserServiceTests()
     {
-        // Initialize the UserService with the mocked IDataContext in the constructor
+        // Initialize the UserService with the mocked IDataContext in the constructor.
         _service = new UserService(_dataContext.Object);
-        // Set up users for all tests
+        // Set up users for all tests.
         _users = SetupUsers(
             ("Active User 1", "User", "active1@example.com", true),
             ("Active User 2", "User", "active2@example.com", true),
@@ -32,7 +32,10 @@ public class UserServiceTests
             IsActive = u.IsActive
         }).AsQueryable();
 
+        // Prepares the mock IDataContext to run with the predefined 'users' list in the testing environment.
         _dataContext.Setup(s => s.GetAll<User>()).Returns(users);
+        // No preparation required for the FilterByActive method because it is already part of the UserService we are testing.
+
 
         return users;
     }

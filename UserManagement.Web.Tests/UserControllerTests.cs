@@ -14,9 +14,9 @@ public class UserControllerTests
     private readonly Mock<IUserService> _userServiceMock = new();
     public UserControllerTests()
     {
-        // Initialize the UsersController with the mocked IUserService in the constructor
+        // Initialize the UsersController with the mocked IUserService in the constructor.
         _controller = new UsersController(_userServiceMock.Object);
-        // Set up users for all tests
+        // Set up users for all tests.
         _users = SetupUsers(
             ("Active User 1", "User", "active1@example.com", true),
             ("Active User 2", "User", "active2@example.com", true),
@@ -35,7 +35,7 @@ public class UserControllerTests
             IsActive = u.IsActive
         }).ToArray();
 
-        // Prepares the mock IUserService to run with the predefined 'users' list in the testing environment
+        // Prepares the mock IUserService to run with the predefined 'users' list in the testing environment.
         _userServiceMock.Setup(s => s.GetAll()).Returns(users);
         _userServiceMock.Setup(s => s.FilterByActive(It.IsAny<bool>())).Returns((bool isActive) => users.Where(u => u.IsActive == isActive));
 

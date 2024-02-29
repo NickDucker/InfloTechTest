@@ -43,5 +43,5 @@ public class DataContextTests
         result.Should().NotContain(s => s.Email == entity.Email);
     }
 
-    private DataContext CreateContext() => new();
+    private static DataContext CreateContext() => new();
 }

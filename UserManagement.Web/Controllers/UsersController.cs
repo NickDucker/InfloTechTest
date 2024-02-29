@@ -31,12 +31,13 @@ public class UsersController(IUserService userService) : Controller
             // If status is not either of the above, call the GetAll method to retrieve all users.
             _ => _userService.GetAll(),
         };
-
+        // Ensure users are sorted by Id in ascending order.
+        var sortedUsers = users.OrderBy(user => user.Id);
         /* Converts the query results into a list of UserListItemViewModel 
         objects which allows the passing of only necessary data to the view 
         (5 attributes listed), enhancing both security and performance by not 
         exposing all data (other sensitive attributes retrieved from the query). */
-        var items = users.Select(p => new UserListItemViewModel
+        var items = sortedUsers.Select(p => new UserListItemViewModel
         {
             Id = p.Id,
             Forename = p.Forename,
@@ -45,7 +46,6 @@ public class UsersController(IUserService userService) : Controller
             DateOfBirth = p.DateOfBirth,
             IsActive = p.IsActive
         }).ToList();
-
         /* Prepare the view model (UserListViewModel) for the user list page.
         Aggregates all the user items in the UserListItemViewModel ('items') into a 
         single object ('model'), making it easier to manage and pass to the view. */
@@ -53,10 +53,66 @@ public class UsersController(IUserService userService) : Controller
         {
             Items = items
         };
-
         /* Returns the view for displaying the user list.
         The model containing the list of users is passed to the view,
         enabling the user data to be rendered. */
         return View(model);
     }
+
+    [HttpPost("add")]
+    public IActionResult AddUser(User user)
+    {
+        if (ModelState.IsValid)
+        {
+            _userService.CreateUser(user);
+            ViewBag.Success = "User created successfully!";
+            return PartialView("_AddUserModal", new User()); // Return a new empty form with a success message
+        }
+        return PartialView("_AddUserModal", user); // Return with validation messages if any
+    }
+
+    [HttpPost("delete")]
+    public IActionResult DeleteUser(int userId)
+    {
+        // Attempt to delete the user using the service
+        var isDeleted = _userService.DeleteUserById(userId);
+        if (isDeleted)
+        {
+            ViewBag.Success = "User deleted successfully!";
+        }
+        else
+        {
+            ViewBag.ErrorMessage = "User not found.";
+        }
+        return PartialView("_DeleteUserModal");
+    }
+
+    [HttpPost("update")]
+    public IActionResult EditUser(User user, int userId)
+    {
+        if (ModelState.IsValid)
+        {
+            var userToUpdate = _userService.GetUserById(userId);
+            if (userToUpdate != null)
+            {
+                // Apply changes to the fetched user.
+                userToUpdate.Forename = user.Forename;
+                userToUpdate.Surname = user.Surname;
+                userToUpdate.Email = user.Email;
+                userToUpdate.DateOfBirth = user.DateOfBirth;
+                userToUpdate.IsActive = user.IsActive;
+                // UpdateUser with the updated entity.
+                _userService.UpdateUser(userToUpdate);
+                ViewBag.Success = "User updated successfully!";
+                // Return the updated user
+                return PartialView("_EditUserModal", userToUpdate);
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "User not found.";
+            }
+        }
+        return PartialView("_EditUserModal", user);
+    }
+
 }

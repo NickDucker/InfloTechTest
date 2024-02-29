@@ -43,9 +43,18 @@
                                 Actions
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnToggleActions">
-                                <li><a class="dropdown-item" href="#">View</a></li>
-                                <li><a class="dropdown-item" href="#">Edit</a></li>
-                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal" 
+                                    data-content-url="/modals/view-user-modal" data-title="View User" data-user-id="@item.Id">View</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal" 
+                                    data-content-url="/modals/edit-user-modal" data-title="Edit User" data-user-id="@item.Id">Edit</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal" 
+                                    data-content-url="/modals/delete-user-modal" data-title="Delete User" data-user-id="@item.Id">Delete</a>
+                                </li>
                             </ul>
                         </div>
                     </td>
@@ -62,11 +71,21 @@
         <a asp-controller="Users" asp-action="List" asp-route-status="inactive" class="btn btn-default">Non Active</a>
     </div>
 
-    <a href="#" class="btn btn-primary float-end">
-        Add User
-    </a>
+    <a href="#" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#modal" 
+    data-content-url="/modals/add-user-modal" data-title="Add New User">Add User</a>
 
-    <!-- Placeholder for Modal -->
-    <div id="modalPlaceholder"></div>
+    <!-- Modal -->
+    <div class="modal fade" id="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Dynamic Modal Content Loaded Here -->
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
     
 </div>

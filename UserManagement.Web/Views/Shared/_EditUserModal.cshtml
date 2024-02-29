@@ -1,0 +1,50 @@
+@model UserManagement.Models.User
+
+@if (ViewBag.Success != null)
+{
+    <div class="alert alert-success" role="alert">
+        @ViewBag.Success
+    </div>
+}
+else if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+else
+{
+    @using (Html.BeginForm("EditUser", "Users", FormMethod.Post, new { @class = "ajax-form" }))
+        {
+        @Html.AntiForgeryToken()
+        <!-- Hidden Field for userId -->
+        @Html.Hidden("userId", Model.Id)
+        <!-- Edit User Modal -->
+        <div class="modal-body">
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Forename, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Forename, new { @class = "form-control", autocomplete = "given-name" })
+                    @Html.ValidationMessageFor(model => model.Forename, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Surname, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Surname, new { @class = "form-control", autocomplete = "family-name" })
+                    @Html.ValidationMessageFor(model => model.Surname, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Email, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", autocomplete = "email" })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.DateOfBirth, new { @class = "form-label" })
+                    <input type="date" id="DateOfBirth" name="DateOfBirth" class="form-control" 
+                    value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" autocomplete="bday" />
+                    @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+                </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" value="Update" class="btn btn-primary" />
+        </div>
+        }
+}

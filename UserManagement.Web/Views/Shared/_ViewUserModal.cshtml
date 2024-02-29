@@ -1,0 +1,28 @@
+@model UserManagement.Models.User
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+else
+{
+    <div class="modal-body">
+        <div class="mb-3">
+            <strong>Id:</strong> @Model.Id
+        </div>
+        <div class="mb-3">
+            <strong>Forename:</strong> @Model.Forename
+        </div>
+        <div class="mb-3">
+            <strong>Surname:</strong> @Model.Surname
+        </div>
+        <div class="mb-3">
+            <strong>Email:</strong> @Model.Email
+        </div>
+        <div class="mb-3">
+            <strong>Date of Birth:</strong> @Model.DateOfBirth
+        </div>
+    </div>
+}

@@ -1,0 +1,29 @@
+@model UserManagement.Models.User
+
+@if (ViewBag.Success != null)
+{
+    <div class="alert alert-success" role="alert">
+        @ViewBag.Success
+    </div>
+}
+else if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+else
+{
+    @using (Html.BeginForm("DeleteUser", "Users", FormMethod.Post, new { @class = "ajax-form" }))
+    {
+        @Html.AntiForgeryToken()
+        <!-- Hidden Field for userId -->
+        @Html.Hidden("userId", Model.Id)
+        <div class="modal-body">
+            <p>Are you sure you want to delete @Model.Forename @Model.Surname?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+    }
+}
